@@ -2,7 +2,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Visual.Views.MainView">
-	
+			 xmlns:views="clr-namespace:Visual.Views"
+			 xmlns:models="clr-namespace:Visual.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+             x:Class="Visual.Views.MainView"
+			 x:DataType="views:BookView">
+	<DockPanel Name="dockPanel_mainView">
+		<TextBox Text="Кусок твари"></TextBox>
+		<ItemsControl Name="dataView">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<views:BookView/>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</DockPanel>
 </UserControl>

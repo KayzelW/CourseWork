@@ -1,0 +1,41 @@
+﻿@page "/bin"
+
+@using BookDesktop.Data
+@using BookDesktop.Service
+@using Classes
+@inject BinService bin
+
+<div class="d-flex">
+    <div class="p-2 w-100">
+        <h1>Корзина</h1>
+    </div>
+    <div class="p-2 flex-shrink-1">
+        <a class="btn btn-primary" href="/books" role="button">Книги</a>
+    </div>
+</div>
+
+<table class="table table-bordered border-primary">
+    @foreach (var book in bin.books)
+    {
+        <tr>
+            <td>@book.Name</td>
+            <td>@book.Author</td>
+            <td>@book.Price</td>
+            <td>
+                <button type="button" class="btn btn-outline-secondary" onclick="@(() => {RemoveFromBin(book);})">Удалить из корзины</button>
+            </td>
+        </tr>
+    }
+</table>
+
+
+
+
+@code {
+
+    public void RemoveFromBin(Book book)
+    {
+        bin.books.Remove(book);
+        InvokeAsync(StateHasChanged);
+    }
+}

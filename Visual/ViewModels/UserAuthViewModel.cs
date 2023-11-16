@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
 namespace Visual.ViewModels;
 
-public class UserAuthViewModel : ViewModelBase, INotifyPropertyChanged
+public class UserAuthViewModel : ObservableObject, INotifyPropertyChanged
 {
     private string _userLogin = string.Empty;
     private string _userPassword = string.Empty;

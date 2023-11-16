@@ -17,7 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Author> Authors { get; set; }
     public DbSet<Genre> Genres { get; set; }
 
-    public string databasepath;
+    //public string databasepath = $"Data Source={@"C:\Projects\CourseWork\MyDatabase.db"}";
+    //"Host=127.0.0.1;Port=5432;Database=KRVBooks;Username=TestGroupLocalhost;Password=postgres;";
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -25,12 +26,13 @@ public class AppDbContext : DbContext
         //var databasePath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "MyDatabase.db");
 
         //optionsBuilder.UseSQlite($"Data Source={databasePath}");
-        optionsBuilder.UseNpgsql(databasepath);
+        //optionsBuilder.UseNpgsql(databasepath);
+        //optionsBuilder.UseSqlite(databasepath);   
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>().HasMany(u => u.Books).WithOne(b => b.User);
+        modelBuilder.Entity<User>().HasMany(u => u.Books);
         modelBuilder.Entity<Book>().HasMany(x => x.Genres);
         modelBuilder.Entity<Book>().HasOne(x => x.Author);
     }

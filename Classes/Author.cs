@@ -13,4 +13,9 @@ public class Author
     {
         
     }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

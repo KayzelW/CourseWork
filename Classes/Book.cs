@@ -14,10 +14,12 @@ public class Book : INotifyPropertyChanged
     public List<Genre> Genres { get; set; } = new();
     public int? AuthorId { get; set; }
     [ForeignKey(nameof(AuthorId))]
-    public Author Author { get; set; }
-    public int? UserId { get; set; }
-    [ForeignKey(nameof(UserId))]
-    public User? User { get; set; }
+    public Author? Author { get; set; } = new Author
+    {
+        Name = "BookAuthor",
+    };
+    public byte[]? Image {  get; set; }
+    
 
     public Book(int id, string name, Author author, double price, int amount, List<Genre> genres) : this() =>
         (this.Id, this.Name, this.Author, this.Price, this.Amount, this.Genres) = (id, name, author, price, amount, genres);

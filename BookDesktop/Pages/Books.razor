@@ -1,0 +1,78 @@
+﻿@page "/books"
+@using BookDesktop.Service
+@using Classes
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext dbcontext
+@inject BinService bin
+
+<div class="d-flex">
+    <div class="p-2 w-100">
+        <h1>Книги</h1>
+    </div>
+    <div class="p-2 flex-shrink-1">
+        <a class="btn btn-primary" href="/bin" role="button">Корзина</a>
+    </div>
+</div>
+
+
+@if (IsLoading)
+{
+    <div>Загрузка</div>
+}
+else
+{
+    <table class="table table-bordered border-primary">
+        @foreach (var book in books)
+        {
+            <tr>
+                <td>@book.Name</td>
+                <td>@book.Author</td>
+                <td>@book.Price</td>
+                <td>
+                    @if (bin.books.Any(x => x.Id == book.Id))
+                    {
+                        <button type="button" class="btn btn-warning" onclick="@(() => {RemoveFromBin(book);})">Удалить из корзины</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-warning" onclick="@(() => {AddToBin(book);})">Добавить в корзину</button>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+}
+
+
+
+@code {
+    public List<Book> books;
+    public bool IsLoading = true;
+    public async Task Load()
+    {
+        books = await dbcontext.Books.ToListAsync();
+
+        IsLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        InvokeAsync(Load);
+    }
+
+    public void AddToBin(Book book)
+    {
+        bin.books.Add(book);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void RemoveFromBin(Book book)
+    {
+        bin.books.Remove(book);
+        InvokeAsync(StateHasChanged);
+    }
+
+}
