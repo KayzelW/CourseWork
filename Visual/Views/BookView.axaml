@@ -16,7 +16,6 @@
 			<TextBox Text="{Binding Name}"/>
 			<TextBlock Text="{Binding Author.Name}"/>
 			<TextBlock Text="{Binding Price}" Height="20"/>
-			<TextBlock Text="{Binding Amount}" Height="20"/>
 		</StackPanel>
 	</StackPanel>
 </UserControl>

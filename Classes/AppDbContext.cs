@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<Book> Books { get; set; }
     public DbSet<Author> Authors { get; set; }
     public DbSet<Genre> Genres { get; set; }
+    public DbSet<BooksAndGenres> BooksAndGenres { get; set; }
+    public DbSet<BooksAndUsers> BooksAndUsers { get; set; }
 
     //public string databasepath = $"Data Source={@"C:\Projects\CourseWork\MyDatabase.db"}";
     //"Host=127.0.0.1;Port=5432;Database=KRVBooks;Username=TestGroupLocalhost;Password=postgres;";
@@ -32,8 +34,16 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>().HasMany(u => u.Books);
-        modelBuilder.Entity<Book>().HasMany(x => x.Genres);
-        modelBuilder.Entity<Book>().HasOne(x => x.Author);
+        modelBuilder.Entity<BooksAndGenres>().HasKey(x => new { x.BookId, x.GenreId });
+        modelBuilder.Entity<BooksAndGenres>()
+            .HasOne(bg => bg.Book)
+            .WithMany(b => b.Genres)
+            .HasForeignKey(bg => bg.BookId);
+
+        modelBuilder.Entity<BooksAndUsers>().HasKey(x => new { x.BookId, x.UserId });
+        modelBuilder.Entity<BooksAndUsers>()
+            .HasOne(bu => bu.User)
+            .WithMany(u => u.Books)
+            .HasForeignKey(bu => bu.UserId);
     }
 }

@@ -17,11 +17,10 @@ public class User : INotifyPropertyChanged
     public string? Login { get; set; }
     public string? Email { get; set; }
     public string? Password { get; set; }
-    public List<Book>? Books { get; set; } = new();
+    public User(int id, string name, string email = "", string password = "") : this() => 
+        (this.Id, this.Login, this.Email, this.Password) = (id, name, email, password);
 
-    public User(int id, string name, string email = "", string password = "", List<Book>? books = null) : this() => 
-        (this.Id, this.Login, this.Email, this.Password, this.Books) = (id, name, email, password, books);
-
+    public IEnumerable<BooksAndUsers>? Books { get; set; } = new List<BooksAndUsers>();
     public User()
     {
         
@@ -32,5 +31,8 @@ public class User : INotifyPropertyChanged
     protected virtual void Dirty(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Id)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Login)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Email)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Password)));
     }
 }

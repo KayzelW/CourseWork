@@ -2,7 +2,6 @@
 using Avalonia.VisualTree;
 using System;
 using Classes;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Visual.Events;
 using System.Linq;
@@ -49,7 +48,7 @@ public partial class MainWindow : Window
             dbContext.Users.Add(new User
             {
                 Id = 1,
-                Books = new List<Book>(),
+                Books = new List<BooksAndUsers>(),
                 Email = "SomeEmail@gmail.com",
                 Login = "root",
                 Password = "root",
@@ -67,7 +66,7 @@ public partial class MainWindow : Window
             for (int i = 1; i <= 10; i++)
             {
                 dbContext.Books.Add(new Book(
-                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100, i * 10, new List<Genre> { new Genre { Id = i, Name = $"{i}TestGenreName" } }
+                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100
                 ));
             }
             dbContext.SaveChanges();
@@ -79,7 +78,7 @@ public partial class MainWindow : Window
     {
         string userLogin = e.UserLogin;
         string userPassword = e.UserPassword;
-        CurrentUser = dbContext.Users.Where(user => user.Login == userLogin && user.Password == userPassword).FirstOrDefault();
+        CurrentUser = dbContext.Users?.Where(user => user.Login == userLogin && user.Password == userPassword).FirstOrDefault();
 
         if (CurrentUser == null)
         {

@@ -2,12 +2,30 @@
 @using BookDesktop.Service
 @using Classes
 @using Microsoft.EntityFrameworkCore
+@using System.Collections.ObjectModel
+@using Microsoft.UI.Xaml.Controls
 @inject AppDbContext dbcontext
 @inject BinService bin
 
 <div class="d-flex">
     <div class="p-2 w-100">
         <h1>Книги</h1>
+    </div>
+    <div class="p-2 dropdown-center">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Filter
+          </button>
+        <ul class="dropdown-menu">
+            @foreach (var genre in dbcontext.Genres.ToList()) 
+            { 
+                <li> 
+                    <label class="dropdown-item"> 
+                        <input type="checkbox" checked="@selectedGenres.Contains(genre)" @onchange="@(e => ToggleGenreFilter(genre))"/> 
+                        @genre 
+                    </label> 
+                </li> 
+            } 
+        </ul>
     </div>
     <div class="p-2 flex-shrink-1">
         <a class="btn btn-primary" href="/bin" role="button">Корзина</a>
@@ -21,8 +39,14 @@
 }
 else
 {
-    <table class="table table-bordered border-primary">
-        @foreach (var book in books)
+    <table class="table table-bordered border-primary" aria-valuemin="200">
+        <tr>
+            <td>Наименование</td>
+            <td>Автор</td>
+            <td>Стоимость</td>
+            <td>Корзина</td>
+        </tr>
+        @foreach (var book in GetBooksWithFilter().Result)
         {
             <tr>
                 <td>@book.Name</td>
@@ -31,11 +55,11 @@ else
                 <td>
                     @if (bin.books.Any(x => x.Id == book.Id))
                     {
-                        <button type="button" class="btn btn-warning" onclick="@(() => {RemoveFromBin(book);})">Удалить из корзины</button>
+                        <button type="button" class="btn btn-warning" onclick="@(() => { ToggleBookBin(book); })">Удалить из корзины</button>
                     }
                     else
                     {
-                        <button type="button" class="btn btn-warning" onclick="@(() => {AddToBin(book);})">Добавить в корзину</button>
+                        <button type="button" class="btn btn-warning" onclick="@(() => { ToggleBookBin(book); })">Добавить в корзину</button>
                     }
                 </td>
             </tr>
@@ -46,32 +70,61 @@ else
 
 
 @code {
-    public List<Book> books;
-    public bool IsLoading = true;
-    public async Task Load()
+    bool IsLoading = true;
+    List<Book> books = new();
+    List<Genre> genres = new();
+    List<Genre> selectedGenres = new();
+
+    async Task<List<Book>> GetBooksWithFilter()
+    {
+        if (selectedGenres.Count == 0)
+            return books;
+
+        var filteredBooks = await dbcontext.Books
+            .Where(book => book.Genres.Any(bg => selectedGenres.Contains(bg.Genre)))
+            .ToListAsync();
+
+        return filteredBooks;
+    }
+
+    async Task Load()
     {
         books = await dbcontext.Books.ToListAsync();
+        genres = await dbcontext.Genres.ToListAsync();
 
         IsLoading = false;
         await InvokeAsync(StateHasChanged);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-
-        InvokeAsync(Load);
+        await base.OnInitializedAsync();
+        await InvokeAsync(Load);
     }
 
-    public void AddToBin(Book book)
+    private void ToggleBookBin(Book book)
     {
-        bin.books.Add(book);
+        if (bin.books.Contains(book))
+        {
+            bin.books.Remove(book);
+        }
+        else
+        {
+            bin.books.Add(book);
+        }
         InvokeAsync(StateHasChanged);
     }
 
-    public void RemoveFromBin(Book book)
+    private void ToggleGenreFilter(Genre genre)
     {
-        bin.books.Remove(book);
+        if (selectedGenres.Contains(genre))
+        {
+            selectedGenres.Remove(genre);
+        }
+        else
+        {
+            selectedGenres.Add(genre);
+        }
         InvokeAsync(StateHasChanged);
     }
 

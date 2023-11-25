@@ -10,8 +10,6 @@ public class Book : INotifyPropertyChanged
     public int Id { get; set; }
     public string Name { get; set; } = "BookName";
     public double Price { get; set; }
-    public int Amount { get; set; }
-    public List<Genre> Genres { get; set; } = new();
     public int? AuthorId { get; set; }
     [ForeignKey(nameof(AuthorId))]
     public Author? Author { get; set; } = new Author
@@ -20,10 +18,10 @@ public class Book : INotifyPropertyChanged
     };
     public byte[]? Image {  get; set; }
     
+    public Book(int id, string name, Author author, double price) : this() =>
+        (this.Id, this.Name, this.Author, this.Price) = (id, name, author, price);
 
-    public Book(int id, string name, Author author, double price, int amount, List<Genre> genres) : this() =>
-        (this.Id, this.Name, this.Author, this.Price, this.Amount, this.Genres) = (id, name, author, price, amount, genres);
-
+    public List<BooksAndGenres> Genres { get; set; } = new();
     public Book()
     {
         

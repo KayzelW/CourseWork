@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,5 +18,17 @@ public class Genre
     public Genre()
     {
         
+    }
+    
+    public override string ToString()
+        => Name;
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Genre genre)
+        {
+            return this.Id == genre.Id;
+        }
+        return false;
     }
 }
