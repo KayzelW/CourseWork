@@ -17,9 +17,10 @@ public class Book : INotifyPropertyChanged
         Name = "BookAuthor",
     };
     public byte[]? Image {  get; set; }
-    
-    public Book(int id, string name, Author author, double price) : this() =>
-        (this.Id, this.Name, this.Author, this.Price) = (id, name, author, price);
+    public int Amount { get; set; } = 0;
+
+    public Book(int id, string name, Author author, double price, int amount) : this() =>
+        (this.Id, this.Name, this.Author, this.Price, this.Amount) = (id, name, author, price, amount);
 
     public List<BooksAndGenres> Genres { get; set; } = new();
     public Book()

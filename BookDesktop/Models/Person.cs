@@ -10,10 +10,10 @@ namespace BookDesktop.Models;
 public class Person
 {
     [Required]
-    [StringLength(10, ErrorMessage = "Login is too long.")]
+    [StringLength(15, ErrorMessage = "Login is too long.")]
     public string? Login { get; set; }
 
     [Required]
-    [StringLength(10, ErrorMessage = "Password is too long.")]
+    [StringLength(20, ErrorMessage = "Password is too long.")]
     public string? Password { get; set; }
 }

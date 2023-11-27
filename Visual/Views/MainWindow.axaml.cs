@@ -66,7 +66,7 @@ public partial class MainWindow : Window
             for (int i = 1; i <= 10; i++)
             {
                 dbContext.Books.Add(new Book(
-                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100
+                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100, i*10
                 ));
             }
             dbContext.SaveChanges();

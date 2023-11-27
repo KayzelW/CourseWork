@@ -4,6 +4,23 @@
 @using Classes
 @inject BinService bin
 
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/personal_page">Главная страница</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/books">Каталог</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/bin">Корзина</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <div class="d-flex">
     <div class="p-2 w-100">
         <h1>Корзина</h1>
@@ -14,20 +31,26 @@
 </div>
 
 <table class="table table-bordered border-primary">
+    <tr>
+        <td>Наименование</td>
+        <td>Автор</td>
+        <td>Стоимость</td>
+        <td>Экземпляров на складе</td>
+        <td>Действия</td>
+    </tr>
     @foreach (var book in bin.books)
     {
         <tr>
             <td>@book.Name</td>
             <td>@book.Author</td>
             <td>@book.Price</td>
+            <td>@book.Amount</td>
             <td>
-                <button type="button" class="btn btn-outline-secondary" onclick="@(() => {RemoveFromBin(book);})">Удалить из корзины</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="@(() => { RemoveFromBin(book); })">Удалить из корзины</button>
             </td>
         </tr>
     }
 </table>
-
-
 
 
 @code {
@@ -37,4 +60,5 @@
         bin.books.Remove(book);
         InvokeAsync(StateHasChanged);
     }
+
 }

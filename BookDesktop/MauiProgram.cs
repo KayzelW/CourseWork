@@ -74,7 +74,7 @@ public static class MauiProgram
                 }
 
                 var book = new Book(
-                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100);
+                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100, i*10);
                 dbContext.Books.Add(book);
                 dbContext.BooksAndGenres.Add(new BooksAndGenres()
                     { BookId = i, GenreId = i, Book = book, Genre = lastGenre });
