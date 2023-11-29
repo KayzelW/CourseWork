@@ -8,7 +8,7 @@
 @inject AuthService authService
 @inject BookChangeService bookChangeService
 
-<Menu></Menu>
+<Menu/>
 @if (IsLoading)
 {
     <div>Загрузка</div>
@@ -95,6 +95,7 @@ else
             Operation = $"{authService.CurrentUser.Login} изменил статус заказа({order.Id}) на {status}",
             UserId = authService.CurrentUser.Id,
         });
+        dbcontext.SaveChanges();
         InvokeAsync(StateHasChanged);
     }
 

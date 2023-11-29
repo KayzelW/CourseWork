@@ -13,7 +13,7 @@
 }
 else
 {
-    <Menu></Menu>
+    <Menu/>
     <div class="w-50 m-auto">
         <h3>Добавление книги</h3>
         <EditForm Model="@bookNew" OnValidSubmit="@BookCommit_change">
@@ -33,11 +33,37 @@ else
                 </InputSelect>
             </div>
             <div class="mb-3">
-                @foreach (var genre in genres)
+                @if (ShowGenres)
                 {
-                    <input type="checkbox" @bind="checkedGenres[genre.Id]" />
-                    <label>@genre.Name</label>
-                    <br />
+                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged); })">Отобразить жанры</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged);})">Скрыть жанры</button>
+                }
+                @if (ShowGenres)
+                {
+                    <div class="card text-bg-primary mb-3" style="width: 18rem;">
+                        <ul class="list-group list-group-flush">
+                            <div class="card-header">Жанры</div>
+                            <div class="card-body">
+                                <table>
+                                    @foreach (var genre in genres)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="list-group-item" @bind="checkedGenres[genre.Id]"/>
+                                            </td>
+                                            <td>
+                                                <label>@genre.Name</label>
+                                            </td>
+                                        </tr>
+                                        <br/>
+                                    }
+                                </table>
+                            </div>
+                        </ul>
+                    </div>
                 }
             </div>
             <div class="mb-3">
@@ -55,7 +81,8 @@ else
 @code {
     Book bookNew = new();
     bool IsLoading = true;
-
+    public bool ShowGenres = false;
+    
     public Dictionary<int, bool> checkedGenres = new();
 
     List<Author> authors = new();

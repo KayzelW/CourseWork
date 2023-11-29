@@ -14,7 +14,7 @@
 }
 else
 {
-    <Menu></Menu>
+    <Menu/>
     <div class="d-flex">
         <div class="p-2 w-100">
             <h1>Книги</h1>
@@ -35,12 +35,12 @@ else
                 }
             </ul>
         </div>
-        <div class="p-2 flex-shrink-1">
-            <a class="btn btn-primary" href="/bin" role="button">Корзина</a>
-        </div>
-        <div class="p-2 flex-shrink-2">
-            <a class="btn btn-secondary" type="button" href="/book_add">Добавить</a>
-        </div>
+        @if (authService.CurrentUser.PermissionLvl != 1)
+        {
+            <div class="p-2 flex-shrink-2">
+                <a class="btn btn-secondary" type="button" href="/book_add">Добавить</a>
+            </div>
+        }
     </div>
 
 
@@ -60,7 +60,7 @@ else
         {
             <tr>
                 <td>@book.Name</td>
-                <td>@book.Author</td>
+                <td>@book.Author?.Name</td>
                 <td>@book.Price</td>
                 <td>@book.Amount</td>
                 @if (authService.CurrentUser!.PermissionLvl != 1)
@@ -88,6 +88,7 @@ else
             return books;
 
         var filteredBooks = await dbcontext.Books
+            .Include(x => x.Author)
             .Where(book => book.Genres.Any(bg => selectedGenres.Contains(bg)))
             .ToListAsync();
 
@@ -96,7 +97,9 @@ else
 
     async Task Load()
     {
-        books = await dbcontext.Books.ToListAsync();
+        books = await dbcontext.Books
+            .Include(x => x.Author)
+            .ToListAsync();
         genres = await dbcontext.Genres.ToListAsync();
 
         IsLoading = false;
