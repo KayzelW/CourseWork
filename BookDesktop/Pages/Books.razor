@@ -5,50 +5,8 @@
 @using System.Collections.ObjectModel
 @using Microsoft.UI.Xaml.Controls
 @inject AppDbContext dbcontext
-@inject BinService bin
-
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/personal_page">Главная страница</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/books">Каталог</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/bin">Корзина</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<div class="d-flex">
-    <div class="p-2 w-100">
-        <h1>Книги</h1>
-    </div>
-    <div class="p-2 dropdown-center">
-        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Фильтр
-        </button>
-        <ul class="dropdown-menu">
-            @foreach (var genre in dbcontext.Genres.ToList())
-            {
-                <li>
-                    <label class="dropdown-item">
-                        <input type="checkbox" checked="@selectedGenres.Contains(genre)" @onchange="@(e => ToggleGenreFilter(genre))"/>
-                        @genre
-                    </label>
-                </li>
-            }
-        </ul>
-    </div>
-    <div class="p-2 flex-shrink-1">
-        <a class="btn btn-primary" href="/bin" role="button">Корзина</a>
-    </div>
-</div>
-
+@inject AuthService authService
+@inject BookChangeService bookChangeService
 
 @if (IsLoading)
 {
@@ -56,13 +14,47 @@
 }
 else
 {
+    <Menu></Menu>
+    <div class="d-flex">
+        <div class="p-2 w-100">
+            <h1>Книги</h1>
+        </div>
+        <div class="p-2 dropdown-center">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Фильтр
+            </button>
+            <ul class="dropdown-menu">
+                @foreach (var genre in dbcontext.Genres.ToList())
+                {
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" checked="@selectedGenres.Contains(genre)" @onchange="@(e => ToggleGenreFilter(genre))" />
+                            @genre
+                        </label>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="p-2 flex-shrink-1">
+            <a class="btn btn-primary" href="/bin" role="button">Корзина</a>
+        </div>
+        <div class="p-2 flex-shrink-2">
+            <a class="btn btn-secondary" type="button" href="/book_add">Добавить</a>
+        </div>
+    </div>
+
+
+
     <table class="table table-bordered border-primary" aria-valuemin="200">
         <tr>
             <td>Наименование</td>
             <td>Автор</td>
             <td>Стоимость</td>
             <td>Экземпляры</td>
-            <td>Действия</td>
+            @if (authService.CurrentUser!.PermissionLvl != 1)
+            {
+                <td>Действия</td>
+            }
         </tr>
         @foreach (var book in GetBooksWithFilter().Result)
         {
@@ -71,16 +63,12 @@ else
                 <td>@book.Author</td>
                 <td>@book.Price</td>
                 <td>@book.Amount</td>
-                <td>
-                    @if (bin.books.Any(x => x.Id == book.Id))
-                    {
-                        <button type="button" class="btn btn-warning" onclick="@(() => { ToggleBookBin(book); })">Удалить из корзины</button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-warning" onclick="@(() => { ToggleBookBin(book); })">Добавить в корзину</button>
-                    }
-                </td>
+                @if (authService.CurrentUser!.PermissionLvl != 1)
+                {
+                    <td>
+                        <button type="button" class="btn btn-warning" onclick="@(() => { ChangeBook(book); })">Изменить</button>
+                    </td>
+                }
             </tr>
         }
     </table>
@@ -100,7 +88,7 @@ else
             return books;
 
         var filteredBooks = await dbcontext.Books
-            .Where(book => book.Genres.Any(bg => selectedGenres.Contains(bg.Genre)))
+            .Where(book => book.Genres.Any(bg => selectedGenres.Contains(bg)))
             .ToListAsync();
 
         return filteredBooks;
@@ -121,18 +109,9 @@ else
         await InvokeAsync(Load);
     }
 
-    private void ToggleBookBin(Book book)
+    private void ChangeBook(Book book)
     {
-        if (bin.books.Contains(book))
-        {
-            bin.books.Remove(book);
-        }
-        else
-        {
-            if (book.Amount > 0)
-                bin.books.Add(book);
-        }
-        InvokeAsync(StateHasChanged);
+        bookChangeService.ChangeBook(book);
     }
 
     private void ToggleGenreFilter(Genre genre)

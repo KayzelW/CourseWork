@@ -11,13 +11,12 @@ namespace BookDesktop.Service;
 
 public class AuthService
 {
-    private readonly AppDbContext dbContext;
-    private readonly NavigationManager navigation;
-    public static User CurrentUser{ get; set; }
-    public AuthService(AppDbContext dbContext, NavigationManager Navigation)
+    private AppDbContext dbContext { get; set; }
+    public User? CurrentUser { get; set; }
+
+    public AuthService(AppDbContext DbContext)
     {
-        this.dbContext = dbContext;
-        navigation = Navigation;
+        dbContext = DbContext;
     }
 
     /// <summary>
@@ -25,7 +24,7 @@ public class AuthService
     /// </summary>
     /// <param name="login"></param>
     /// <param name="password"></param>
-    public void Login(string login, string password)
+    public void Login(NavigationManager navigation, string login, string password)
     {
         var user = dbContext.Users.FirstOrDefault(x => x.Login == login && x.Password == password);
         if (user == null)

@@ -1,0 +1,101 @@
+﻿@page "/orders"
+@using BookDesktop.Service
+@using Classes
+@using Microsoft.EntityFrameworkCore
+@using System.Collections.ObjectModel
+@using Microsoft.UI.Xaml.Controls
+@inject AppDbContext dbcontext
+@inject AuthService authService
+@inject BookChangeService bookChangeService
+
+<Menu></Menu>
+@if (IsLoading)
+{
+    <div>Загрузка</div>
+}
+else
+{
+    <h3>Заказы</h3>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var order in OrderList)
+        {
+            <div class="col">
+                <div class="card text-bg-primary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Номер: @order.Id</div>
+                    <div class="card-header">Статус: @order.orderStatus</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Входящие книги</h5>
+                        <table>
+                            @foreach (var book in order.Books)
+                            {
+                                <tr>
+                                    <th>Название</th>
+                                    <td>@book.Name</td>
+                                </tr>
+                                <tr>
+                                    <th>Автор</th>
+                                    <td>@book.Author</td>
+                                </tr>
+                                <tr>
+                                    <th>Количество</th>
+                                    <td>@book.Amount</td>
+                                </tr>
+                                <tr>
+                                    <th>Цена</th>
+                                    <td>@book.Price</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <hr/>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Изменить статус
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Approved))">Подтвердить</button></li>
+                                <li><button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Completed))">Выполнен</button></li>
+                                <li><button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Cancelled))">Отменить</button></li>
+                                <li><button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.InDeliver))">В пути</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    bool IsLoading = true;
+    public List<Order> OrderList { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        OrderList = dbcontext.Orders
+            .Include(x => x.Books)
+            .ThenInclude(b => b.Author)
+            .Include(x => x.Performer)
+            .ToList();
+
+        IsLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void ChangeOrderStatus(Order order, OrderStatus status)
+    {
+        order.orderStatus = status;
+        dbcontext.Logs.Add(new Log
+        {
+            Operation = $"{authService.CurrentUser.Login} изменил статус заказа({order.Id}) на {status}",
+            UserId = authService.CurrentUser.Id,
+        });
+        InvokeAsync(StateHasChanged);
+    }
+
+}

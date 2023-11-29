@@ -16,9 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<Book> Books { get; set; }
     public DbSet<Author> Authors { get; set; }
     public DbSet<Genre> Genres { get; set; }
-    public DbSet<BooksAndGenres> BooksAndGenres { get; set; }
-    public DbSet<BooksAndOrders> BooksAndOrders { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<Log> Logs { get; set; }
 
     //public string databasepath = $"Data Source={@"C:\Projects\CourseWork\MyDatabase.db"}";
     //"Host=127.0.0.1;Port=5432;Database=KRVBooks;Username=TestGroupLocalhost;Password=postgres;";
@@ -35,17 +34,16 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BooksAndGenres>().HasKey(x => new { x.BookId, x.GenreId });
-        modelBuilder.Entity<BooksAndGenres>()
-            .HasOne(bg => bg.Book)
-            .WithMany(b => b.Genres)
-            .HasForeignKey(bg => bg.BookId);
+        modelBuilder.Entity<Book>()
+            .HasMany(b => b.Genres)
+            .WithMany(bg => bg.Books);
 
-        modelBuilder.Entity<BooksAndOrders>().HasKey(x => new { x.BookId, x.OrderId });
-        modelBuilder.Entity<BooksAndOrders>()
-            .HasOne(bo => bo.Order)
-            .WithMany(bl => bl.BookList)
-            .HasForeignKey(bo => bo.OrderId);
-        
+        modelBuilder.Entity<Order>()
+            .HasMany(o => o.Books)
+            .WithMany(b => b.Orders);
+
+        modelBuilder.Entity<User>()
+            .HasMany(x => x.Logs)
+            .WithOne(b => b.User);
     }
 }

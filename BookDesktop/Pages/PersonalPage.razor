@@ -1,23 +1,18 @@
 ﻿@page "/personal_page"
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/personal_page">Главная страница</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/books">Каталог</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/bin">Корзина</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<h3>PersonalPage</h3>
+@inject AuthService authService
+@inject NavigationManager navigation
+@using BookDesktop.Service
+
+
+<Menu></Menu>
+
+<h1>@authService.CurrentUser</h1>
+<button type="button" class="btn btn-warning" onclick="@Logout">Выйти</button>
 
 @code {
-
+    public void Logout()
+    {
+        authService.CurrentUser = null;
+        navigation.NavigateTo("/");
+    }
 }

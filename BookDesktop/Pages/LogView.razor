@@ -1,0 +1,49 @@
+﻿@page "/log_view"
+@using BookDesktop.Models
+@using BookDesktop.Service
+@using Classes
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext dbcontext
+@inject NavigationManager navigation
+@inject AuthService authService
+
+<Menu></Menu>
+@if (IsLoading)
+{
+    <div>Загрузка</div>
+}
+else
+{
+    <h3>Логи</h3>
+    <table class="table table-bordered border-primary" aria-valuemin="200">
+        <tr>
+            <td>Исполнитель</td>
+            <td>Действие</td>
+            <td>Время</td>
+        </tr>
+        @foreach (var log in Logs)
+        {
+            <tr>
+                <td>@log.User?.Login</td>
+                <td>@log.Operation</td>
+                <td>@log.Created</td>
+            </tr>
+        }
+    </table>
+}
+
+@code {
+    bool IsLoading = true;
+    public List<Log> Logs { get; set; } = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        Logs = dbcontext.Logs.Include(x => x.User).ToList();
+
+        IsLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+}

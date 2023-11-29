@@ -1,0 +1,103 @@
+﻿@page "/book_redact/{bookId:int}"
+@using BookDesktop.Models
+@using BookDesktop.Service
+@using Classes
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext dbcontext
+@inject NavigationManager navigation
+@inject AuthService authService
+
+@if (IsLoading)
+{
+    <div>Загрузка</div>
+}
+else
+{
+    <Menu></Menu>
+    <div class="w-50 m-auto">
+        <h3>Изменение книги</h3>
+        <EditForm Model="@bookLocal" OnValidSubmit="@BookCommit_change">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Название</label>
+                <InputText class="form-control" @bind-Value="bookLocal.Name" id="exampleInputEmail1" />
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Автор</label>
+                <InputSelect @bind-Value="bookLocal.AuthorId" class="form-control">
+                    @foreach (var author in authors)
+                    {
+                        <option value="@author.Id">@author.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                @foreach (var genre in genres)
+                {
+                    <input type="checkbox" @bind="checkedGenres[genre.Id]" />
+                    <label>@genre.Name</label>
+                    <br />
+                }
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Стоимость</label>
+                <InputNumber class="form-control" @bind-Value="bookLocal.Price" id="exampleInputEmail1" />
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Количество</label>
+                <InputNumber class="form-control" @bind-Value="bookLocal.Amount" id="exampleInputEmail1" />
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </EditForm>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int bookId { get; set; }
+
+    public Dictionary<int, bool> checkedGenres = new();
+
+    Book bookLocal = default!;
+    bool IsLoading = true;
+    List<Author> authors = new();
+    List<Genre> genres = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        bookLocal = await dbcontext.Books.Include(x => x.Genres).FirstAsync(b => b.Id == bookId);
+        authors = await dbcontext.Authors.ToListAsync();
+        genres = await dbcontext.Genres.ToListAsync();
+        foreach (var genre in genres)
+        {
+            checkedGenres.Add(genre.Id, bookLocal.Genres.Any(x => x.Id == genre.Id));
+        }
+
+        IsLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async void BookCommit_change()
+    {
+        bookLocal.Genres.Clear();
+        foreach (var id in checkedGenres.Where(x => x.Value).Select(x => x.Key))
+        {
+            bookLocal.Genres.Add(genres.First(x => x.Id == id));
+        }
+        bookLocal.LastRedactor = authService.CurrentUser!;
+
+        dbcontext.Update(bookLocal);
+        dbcontext.Logs.Add(new Log
+            {
+                Operation = $"Внесены изменения в книгу с Id = {bookLocal.Id}",
+                UserId = authService.CurrentUser!.Id,
+            });
+        await dbcontext.SaveChangesAsync();
+        navigation.NavigateTo("books");
+    }
+
+}

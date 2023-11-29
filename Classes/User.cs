@@ -20,10 +20,23 @@ public class User : INotifyPropertyChanged
     public int PermissionLvl { get; set; }
     public User(int id, string name, string email = "", string password = "") : this() => 
         (this.Id, this.Login, this.Email, this.Password) = (id, name, email, password);
-    
+
+    public virtual List<Log> Logs { get; set; } = new();
+
     public User()
     {
         
+    }
+
+    public override string ToString()
+    {
+        return PermissionLvl switch
+        {
+            0 => "root",
+            1 => "Администратор",
+            2 => "Сотрудник",
+            _ => "???"
+        };
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

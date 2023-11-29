@@ -23,6 +23,8 @@ public class Genre
     public override string ToString()
         => Name;
 
+    public virtual List<Book> Books { get; set; } = new();
+
     public override bool Equals(object? obj)
     {
         if (obj is Genre genre)
