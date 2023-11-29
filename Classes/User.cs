@@ -17,10 +17,10 @@ public class User : INotifyPropertyChanged
     public string? Login { get; set; }
     public string? Email { get; set; }
     public string? Password { get; set; }
+    public int PermissionLvl { get; set; }
     public User(int id, string name, string email = "", string password = "") : this() => 
         (this.Id, this.Login, this.Email, this.Password) = (id, name, email, password);
-
-    public IEnumerable<BooksAndUsers>? Books { get; set; } = new List<BooksAndUsers>();
+    
     public User()
     {
         
@@ -34,5 +34,6 @@ public class User : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Login)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Email)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Password)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PermissionLvl)));
     }
 }

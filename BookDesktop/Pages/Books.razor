@@ -129,7 +129,7 @@ else
         }
         else
         {
-            if (book.Amount <> 0)
+            if (book.Amount > 0)
                 bin.books.Add(book);
         }
         InvokeAsync(StateHasChanged);

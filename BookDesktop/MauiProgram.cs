@@ -11,8 +11,9 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        Environment.CurrentDirectory = 
-            AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.IndexOf("BookDesktop"));
+        Environment.CurrentDirectory =
+            AppDomain.CurrentDomain.BaseDirectory.Substring(0,
+                AppDomain.CurrentDomain.BaseDirectory.IndexOf("BookDesktop"));
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -41,46 +42,73 @@ public static class MauiProgram
         return app;
     }
 
-    private static void DbDataFill(AppDbContext dbContext)
+    private async static void DbDataFill(AppDbContext dbContext)
     {
-        if (dbContext.Users.Where(u => u.Login == "root").ToList().Count == 0) //User
+        await Task.Run(() =>
         {
-            dbContext.Users.Add(new User
+            if (dbContext.Users.ToList().Count < 4) //root
             {
-                Id = 1,
-                Books = new List<BooksAndUsers>(),
-                Email = "SomeEmail@gmail.com",
-                Login = "root",
-                Password = "root",
-            });
-            dbContext.SaveChanges();
-        }
-
-        if (dbContext.Authors.Where(author => author.Name == "AuthorTestName").ToList().Count == 0) //Author
-        {
-            dbContext.Authors.Add(new Author { Id = 1, Name = "AuthorTestName" });
-            dbContext.SaveChanges();
-        }
-
-        if (dbContext.Books.Where(book => book.Name.Contains("testbookName")).ToList().Count == 0) //Book
-        {
-            for (int i = 1; i <= 10; i++)
-            {
-                var lastGenre = new Genre();
-                if (dbContext.Genres.Where(x => x.Id == i).FirstOrDefault() == null)
+                dbContext.Users.Add(new User
                 {
-                    lastGenre = new Genre { Id = i, Name = $"{i}TestGenreName" };
-                    dbContext.Genres.Add(lastGenre);
-                }
-
-                var book = new Book(
-                    i, $"testbookName{i}", dbContext.Authors.First(), i * 100, i*10);
-                dbContext.Books.Add(book);
-                dbContext.BooksAndGenres.Add(new BooksAndGenres()
-                    { BookId = i, GenreId = i, Book = book, Genre = lastGenre });
+                    Id = 1,
+                    Email = "RootEmail@gmail.com",
+                    Login = "root",
+                    Password = "root",
+                    PermissionLvl = 0
+                });
+                dbContext.Users.Add(new User //admin
+                {
+                    Id = 2,
+                    Email = "AdminEmail@gmail.com",
+                    Login = "admin",
+                    Password = "admin",
+                    PermissionLvl = 1
+                });
+                dbContext.Users.Add(new User //employeer1
+                {
+                    Id = 3,
+                    Email = "Emp1Email@gmail.com",
+                    Login = "employeer1",
+                    Password = "employeer1",
+                    PermissionLvl = 2
+                });
+                dbContext.Users.Add(new User //employeer2
+                {
+                    Id = 4,
+                    Email = "Emp2Email@gmail.com",
+                    Login = "employeer2",
+                    Password = "employeer2",
+                    PermissionLvl = 2
+                });
+                dbContext.SaveChanges();
             }
 
-            dbContext.SaveChanges();
-        }
+            if (dbContext.Authors.Where(author => author.Name == "AuthorTestName").ToList().Count == 0) //Author
+            {
+                dbContext.Authors.Add(new Author { Id = 1, Name = "AuthorTestName" });
+                dbContext.SaveChanges();
+            }
+
+            if (dbContext.Books.Where(book => book.Name.Contains("testbookName")).ToList().Count == 0) //Book
+            {
+                for (int i = 1; i <= 10; i++)
+                {
+                    var lastGenre = new Genre();
+                    if (dbContext.Genres.Where(x => x.Id == i).FirstOrDefault() == null)
+                    {
+                        lastGenre = new Genre { Id = i, Name = $"{i}TestGenreName" };
+                        dbContext.Genres.Add(lastGenre);
+                    }
+
+                    var book = new Book(
+                        i, $"testbookName{i}", dbContext.Authors.First(), i * 100, i * 10);
+                    dbContext.Books.Add(book);
+                    dbContext.BooksAndGenres.Add(new BooksAndGenres()
+                        { BookId = i, GenreId = i, Book = book, Genre = lastGenre });
+                }
+
+                dbContext.SaveChanges();
+            }
+        });
     }
 }
