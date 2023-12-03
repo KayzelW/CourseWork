@@ -13,7 +13,7 @@ public class Book : INotifyPropertyChanged
     public int? AuthorId { get; set; }
     [ForeignKey(nameof(AuthorId))]
     public Author? Author { get; set; }
-    public byte[]? Image {  get; set; }
+    public byte[]? Image { get; set; }
     public int Amount { get; set; } = 0;
 
     public Book(int id, string name, Author author, double price, int amount) : this() =>
