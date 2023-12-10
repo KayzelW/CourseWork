@@ -35,11 +35,11 @@ else
             <div class="mb-3">
                 @if (ShowGenres)
                 {
-                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged); })">Отобразить жанры</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged); })">Скрыть жанры</button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged);})">Скрыть жанры</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged);})">Отобразить жанры</button>
                 }
                 @if (ShowGenres)
                 {
