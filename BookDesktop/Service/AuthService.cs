@@ -24,12 +24,13 @@ public class AuthService
     /// </summary>
     /// <param name="login"></param>
     /// <param name="password"></param>
-    public void Login(NavigationManager navigation, string login, string password)
+    public bool Login(NavigationManager navigation, string login, string password)
     {
         var user = dbContext.Users.FirstOrDefault(x => x.Login == login && x.Password == password);
         if (user == null)
-            return;
+            return false;
         CurrentUser = user;
         navigation.NavigateTo("personal_page");
+        return true;
     }
 }

@@ -29,7 +29,12 @@
     {
         if (Person.Login != "" && Person.Password != "")
         {
-            authService.Login(navigation, Person.Login!, Person.Password!);
+            if (!authService.Login(navigation, Person.Login!, Person.Password!))
+            {
+                Person.Login = String.Empty;
+                Person.Password = String.Empty;
+                InvokeAsync(StateHasChanged);
+            }
         }
     }
 
