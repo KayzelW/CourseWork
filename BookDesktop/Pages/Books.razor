@@ -5,6 +5,7 @@
 @using System.Collections.ObjectModel
 @using Microsoft.UI.Xaml.Controls
 @inject AppDbContext dbcontext
+@inject NavigationManager navigation
 @inject AuthService authService
 @inject BookChangeService bookChangeService
 
@@ -28,7 +29,7 @@ else
                 {
                     <li>
                         <label class="dropdown-item">
-                            <input type="checkbox" checked="@selectedGenres.Contains(genre)" @onchange="@(e => ToggleGenreFilter(genre))" />
+                            <input type="checkbox" checked="@selectedGenres.Contains(genre)" @onchange="@(e => ToggleGenreFilter(genre))"/>
                             @genre
                         </label>
                     </li>
@@ -42,8 +43,6 @@ else
             </div>
         }
     </div>
-
-
 
     <table class="table table-bordered border-primary" aria-valuemin="200">
         <tr>
@@ -73,7 +72,6 @@ else
         }
     </table>
 }
-
 
 
 @code {
@@ -114,7 +112,7 @@ else
 
     private void ChangeBook(Book book)
     {
-        bookChangeService.ChangeBook(book);
+        navigation.NavigateTo($"book_redact/{book.Id}");
     }
 
     private void ToggleGenreFilter(Genre genre)
@@ -127,6 +125,7 @@ else
         {
             selectedGenres.Add(genre);
         }
+
         InvokeAsync(StateHasChanged);
     }
 

@@ -26,7 +26,7 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         builder.Services.AddSingleton<AuthService>();
-        builder.Services.AddScoped<BookChangeService>();
+        builder.Services.AddSingleton<BookChangeService>();
         builder.Services.AddDbContext<AppDbContext>((options) =>
         {
             options.UseSqlite($"Data Source={Environment.CurrentDirectory + @"\MyDatabase.db"}");

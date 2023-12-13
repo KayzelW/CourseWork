@@ -1,11 +1,13 @@
 ﻿@page "/book_add"
-@using BookDesktop.Models
 @using BookDesktop.Service
 @using Classes
 @using Microsoft.EntityFrameworkCore
+@using Windows.UI.Popups
+@using System.Text.RegularExpressions
 @inject AppDbContext dbcontext
 @inject NavigationManager navigation
 @inject AuthService authService
+@inject BookChangeService bookService
 
 @if (IsLoading)
 {
@@ -13,15 +15,34 @@
 }
 else
 {
-    <Menu/>
+    @if (CanEscape)
+    {
+        <Menu/>
+    }
+
     <div class="w-50 m-auto">
         <h3>Добавление книги</h3>
+
+        @if (HasError)
+        {
+            <div class="d-flex border border-warning">
+                <div class="p-2 w-100">
+                    <p>@MessageError</p>
+                </div>
+                <div class="p-2 flex-shrink-1">
+                    <button type="button" class="btn btn-warning" onclick="@(() => { HasError = false; MessageError = ""; InvokeAsync(StateHasChanged); })">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        }
+
         <EditForm Model="@bookNew" OnValidSubmit="@BookCommit_change">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Название</label>
-                <InputText class="form-control" @bind-Value="bookNew.Name" id="exampleInputEmail1" />
+                <InputText class="form-control" @bind-Value="bookNew.Name" id="exampleInputEmail1"/>
             </div>
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Автор</label>
@@ -39,7 +60,7 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged);})">Скрыть жанры</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged); })">Скрыть жанры</button>
                 }
                 @if (ShowGenres)
                 {
@@ -68,27 +89,32 @@ else
             </div>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Стоимость</label>
-                <InputNumber class="form-control" @bind-Value="bookNew.Price" id="exampleInputEmail1" />
+                <InputNumber class="form-control" @bind-Value="bookNew.Price" id="exampleInputEmail1"/>
             </div>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Количество</label>
-                <InputNumber class="form-control" @bind-Value="bookNew.Amount" id="exampleInputEmail1" />
+                <InputNumber class="form-control" @bind-Value="bookNew.Amount" id="exampleInputEmail1"/>
             </div>
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </EditForm>
     </div>
 }
+
 @code {
     Book bookNew = new();
     bool IsLoading = true;
-    public bool ShowGenres = false;
-    
-    public Dictionary<int, bool> checkedGenres = new();
+    private bool ShowGenres = false;
+
+    string MessageError = "";
+    bool HasError = false;
+    bool CanEscape = true;
+
+    private Dictionary<int, bool> checkedGenres = new();
 
     List<Author> authors = new();
     List<Genre> genres = new();
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
@@ -103,23 +129,53 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
-    public async void BookCommit_change()
+    private async void BookCommit_change()
     {
-        bookNew.Genres.Clear();
-        foreach (var id in checkedGenres.Where(x => x.Value).Select(x => x.Key))
+        bookNew.Name = Regex.Replace(bookNew.Name, @"\s+", " ");
+        if (bookNew.Name == "" || bookNew.Price < 0 || bookNew.Amount < 0)
         {
-            bookNew.Genres.Add(genres.First(x => x.Id == id));
+            MessageError = "Ошибка при сохранении";
+            HasError = true;
+            CanEscape = false;
+            InvokeAsync(StateHasChanged);
         }
-        bookNew.LastRedactor = authService.CurrentUser!;
-        bookNew.Author = dbcontext.Authors.First(x => x.Id == bookNew.AuthorId);
+        else
+        {
+            HasError = false;
+            CanEscape = true;
 
-        dbcontext.Update(bookNew);
-        dbcontext.Logs.Add(new Log
+            bookNew.Name = String.Join( ' ', bookNew.Name.Split());
+            
+            foreach (var id in checkedGenres.Where(x => x.Value).Select(x => x.Key))
             {
-                Operation = $"Добавлена книга с Id = {bookNew.Id}",
-                UserId = authService.CurrentUser!.Id,
-            });
-        await dbcontext.SaveChangesAsync();
-        navigation.NavigateTo("books");
+                bookNew.Genres.Add(genres.First(x => x.Id == id));
+            }
+
+            bookNew.LastRedactor = authService.CurrentUser!;
+
+            bookNew.AuthorId ??= authors.First().Id;
+
+            try
+            {
+                dbcontext.Update(bookNew);
+
+                dbcontext.Logs.Add(new Log
+                {
+                    Operation = $"Добавлена книга с Id = {bookNew.Id}",
+                    UserId = authService.CurrentUser!.Id,
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            await dbcontext.SaveChangesAsync();
+
+            
+
+            navigation.NavigateTo("books");
+        }
     }
+
 }

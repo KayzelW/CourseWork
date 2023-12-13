@@ -19,16 +19,4 @@ public class BookChangeService
         dbContext = DbContext;
         navigation = Navigation;
     }
-
-    public void ChangeBook(Book bookLocal)
-    {
-        navigation.NavigateTo($"book_redact/{bookLocal.Id}");
-    }
-
-    
-
-    //public void BookCommit_new(Book? bookLocal = null)
-    //{
-    //    dbContext.Books.Add(book);
-    //}
 }

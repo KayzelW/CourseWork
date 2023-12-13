@@ -6,6 +6,21 @@
 
 <div class="w-50 m-auto">
     <h3>Авторизация</h3>
+    
+    @if (IsInvalid)
+    {
+        <div class="d-flex border border-warning">
+            <div class="p-2 w-100">
+                <p>Некорректные данные авторизации</p>
+            </div>
+            <div class="p-2 flex-shrink-1">
+                <button type="button" class="btn btn-warning" onclick="@(() => { IsInvalid = false; InvokeAsync(StateHasChanged); })">
+                    Закрыть
+                </button>
+            </div>
+        </div>
+    }
+    
     <EditForm Model="@Person" OnValidSubmit="@Submit">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -24,7 +39,9 @@
 @code
 {
     Person Person = default!;
-
+    bool IsInvalid = false;
+    
+    
     private void Submit()
     {
         if (Person.Login != "" && Person.Password != "")
@@ -33,6 +50,7 @@
             {
                 Person.Login = String.Empty;
                 Person.Password = String.Empty;
+                IsInvalid = true;
                 InvokeAsync(StateHasChanged);
             }
         }
@@ -40,7 +58,6 @@
 
     protected override void OnInitialized()
     {
-
         base.OnInitialized();
         Person = new();
     }

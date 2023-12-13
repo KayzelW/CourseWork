@@ -3,9 +3,11 @@
 @using BookDesktop.Service
 @using Classes
 @using Microsoft.EntityFrameworkCore
+@using System.Text.RegularExpressions
 @inject AppDbContext dbcontext
 @inject NavigationManager navigation
 @inject AuthService authService
+@inject BookChangeService bookService
 
 @if (IsLoading)
 {
@@ -13,9 +15,28 @@
 }
 else
 {
-    <Menu/>
+    @if (CanEscape)
+    {
+        <Menu/>
+    }
+
     <div class="w-50 m-auto">
         <h3>Изменение книги</h3>
+
+        @if (HasError)
+        {
+            <div class="d-flex border border-warning">
+                <div class="p-2 w-100">
+                    <p>@MessageError</p>
+                </div>
+                <div class="p-2 flex-shrink-1">
+                    <button type="button" class="btn btn-warning" onclick="@(() => { HasError = false; MessageError = ""; InvokeAsync(StateHasChanged); })">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        }
+
         <EditForm Model="@bookLocal" OnValidSubmit="@BookCommit_change">
             <DataAnnotationsValidator/>
             <ValidationSummary/>
@@ -39,7 +60,7 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged);})">Отобразить жанры</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="@(() => { ShowGenres = !ShowGenres; InvokeAsync(StateHasChanged); })">Отобразить жанры</button>
                 }
                 @if (ShowGenres)
                 {
@@ -81,12 +102,15 @@ else
 
 @code {
 
-    [Parameter]
-    public int bookId { get; set; }
+    [Parameter] public int bookId { get; set; }
 
     public bool ShowGenres = false;
 
     public Dictionary<int, bool> checkedGenres = new();
+
+    string MessageError = "";
+    bool HasError = false;
+    bool CanEscape = true;
 
     Book bookLocal = default!;
     bool IsLoading = true;
@@ -111,21 +135,37 @@ else
 
     public async void BookCommit_change()
     {
-        bookLocal.Genres.Clear();
-        foreach (var id in checkedGenres.Where(x => x.Value).Select(x => x.Key))
+        bookLocal.Name = Regex.Replace(bookLocal.Name, @"\s+", " ");
+        if (bookLocal.Name == "" || bookLocal.Price < 0 || bookLocal.Amount < 0)
         {
-            bookLocal.Genres.Add(genres.First(x => x.Id == id));
+            MessageError = "Ошибка при сохранении";
+            HasError = true;
+            CanEscape = false;
+            InvokeAsync(StateHasChanged);
         }
-        bookLocal.LastRedactor = authService.CurrentUser!;
-
-        dbcontext.Update(bookLocal);
-        dbcontext.Logs.Add(new Log
+        else
         {
-            Operation = $"Внесены изменения в книгу с Id = {bookLocal.Id}",
-            UserId = authService.CurrentUser!.Id,
-        });
-        await dbcontext.SaveChangesAsync();
-        navigation.NavigateTo("books");
+            HasError = false;
+            CanEscape = true;
+
+            bookLocal.Genres.Clear();
+            foreach (var id in checkedGenres.Where(x => x.Value).Select(x => x.Key))
+            {
+                bookLocal.Genres.Add(genres.First(x => x.Id == id));
+            }
+
+            bookLocal.LastRedactor = authService.CurrentUser!;
+
+
+            dbcontext.Update(bookLocal);
+            dbcontext.Logs.Add(new Log
+            {
+                Operation = $"Внесены изменения в книгу с Id = {bookLocal.Id}",
+                UserId = authService.CurrentUser!.Id,
+            });
+            await dbcontext.SaveChangesAsync();
+            navigation.NavigateTo("books");
+        }
     }
 
 }

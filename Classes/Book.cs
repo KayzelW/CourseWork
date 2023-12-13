@@ -12,20 +12,29 @@ public class Book : INotifyPropertyChanged
     public double Price { get; set; }
     public int? AuthorId { get; set; }
     [ForeignKey(nameof(AuthorId))]
-    public Author? Author { get; set; }
+    public Author? Author { get; set; } = null;
     public byte[]? Image { get; set; }
     public int Amount { get; set; } = 0;
-
-    public Book(int id, string name, Author author, double price, int amount) : this() =>
-        (this.Id, this.Name, this.Author, this.Price, this.Amount) = (id, name, author, price, amount);
-
     public virtual List<Genre> Genres { get; set; } = new();
     public virtual List<Order> Orders { get; set; } = new();
     public User? LastRedactor { get; set; } = null;
 
+    public Book(int id, string name, Author author, double price, int amount) : this() =>
+        (this.Id, this.Name, this.Author, this.Price, this.Amount) = (id, name, author, price, amount);
+    
     public Book()
     {
         
+    }
+
+    public Book(Book book)
+    {
+        Name = book.Name;
+        AuthorId = book.AuthorId;
+        LastRedactor = book.LastRedactor;
+        Genres.AddRange(book.Genres);
+        Price = book.Price;
+        Amount = book.Amount;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
