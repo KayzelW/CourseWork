@@ -161,7 +161,7 @@ else
 
                 dbcontext.Logs.Add(new Log
                 {
-                    Operation = $"Добавлена книга с Id = {bookNew.Id}",
+                    Operation = $"Добавлена книга с именем = {bookNew.Name}",
                     UserId = authService.CurrentUser!.Id,
                 });
             }

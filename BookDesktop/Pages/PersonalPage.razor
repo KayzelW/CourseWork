@@ -7,12 +7,20 @@
 <Menu/>
 
 <h1>@authService.CurrentUser</h1>
-<button type="button" class="btn btn-warning" onclick="@Logout">Выйти</button>
+<div>
+    <button style="margin: auto" type="button" class="btn btn-warning" onclick="@Logout">
+        <i class="bi bi-box-arrow-right" title="Выйти"></i>
+        Выйти
+    </button>
+</div>
+
 
 @code {
+
     public void Logout()
     {
         authService.CurrentUser = null;
         navigation.NavigateTo("/");
     }
+
 }

@@ -11,9 +11,12 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        Environment.CurrentDirectory =
-            AppDomain.CurrentDomain.BaseDirectory.Substring(0,
-                AppDomain.CurrentDomain.BaseDirectory.IndexOf("BookDesktop"));
+        if (Environment.CurrentDirectory.Contains(@"\bin\"))
+        {
+            Environment.CurrentDirectory =
+                AppDomain.CurrentDomain.BaseDirectory.Substring(0,
+                    AppDomain.CurrentDomain.BaseDirectory.IndexOf("BookDesktop"));
+        }
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()

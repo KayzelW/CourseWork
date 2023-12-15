@@ -22,6 +22,7 @@ else
         </div>
         <div class="p-2 dropdown-center">
             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-funnel" title="Фильтр"></i>
                 Фильтр
             </button>
             <ul class="dropdown-menu">
@@ -39,7 +40,10 @@ else
         @if (authService.CurrentUser.PermissionLvl != 1)
         {
             <div class="p-2 flex-shrink-2">
-                <a class="btn btn-secondary" type="button" href="/book_add">Добавить</a>
+                <a class="btn btn-secondary" type="button" href="/book_add" style="display: flex;">
+                    <i class="bi bi-journal-plus" title="Добавить"></i>
+                    Добавить
+                </a>
             </div>
         }
     </div>
@@ -65,7 +69,11 @@ else
                 @if (authService.CurrentUser!.PermissionLvl != 1)
                 {
                     <td>
-                        <button type="button" class="btn btn-warning" onclick="@(() => { ChangeBook(book); })">Изменить</button>
+                        <div style="display: flex; justify-content: center; align-items: center;">
+                            <button style="margin: auto" type="button" class="btn btn-warning" onclick="@(() => { ChangeBook(book); })">
+                                <i class="bi bi-pencil-square" title="Изменить"></i>
+                            </button>
+                        </div>
                     </td>
                 }
             </tr>

@@ -6,7 +6,7 @@
 
 <div class="w-50 m-auto">
     <h3>Авторизация</h3>
-    
+
     @if (IsInvalid)
     {
         <div class="d-flex border border-warning">
@@ -20,19 +20,24 @@
             </div>
         </div>
     }
-    
+
     <EditForm Model="@Person" OnValidSubmit="@Submit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Логин</label>
-            <InputText class="form-control" @bind-Value="Person!.Login" id="exampleInputEmail1" />
+            <InputText class="form-control" @bind-Value="Person!.Login" id="exampleInputEmail1"/>
         </div>
         <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Пароль</label>
-            <InputText type="password" class="form-control" @bind-Value="Person!.Password" id="exampleInputPassword1" />
+            <InputText type="password" class="form-control" @bind-Value="Person!.Password" id="exampleInputPassword1"/>
         </div>
-        <button type="submit" class="btn btn-primary">Войти</button>
+        <div>
+            <button style="margin: auto" type="submit" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right" title="Авторизоваться"></i>
+                Авторизоваться
+            </button>
+        </div>
     </EditForm>
 </div>
 
@@ -40,8 +45,8 @@
 {
     Person Person = default!;
     bool IsInvalid = false;
-    
-    
+
+
     private void Submit()
     {
         if (Person.Login != "" && Person.Password != "")
