@@ -154,7 +154,7 @@ else
                 bookLocal.Genres.Add(genres.First(x => x.Id == id));
             }
 
-            bookLocal.LastRedactor = authService.CurrentUser!;
+            bookLocal.LastRedactorId = authService.CurrentUser!.Id;
 
 
             dbcontext.Update(bookLocal);

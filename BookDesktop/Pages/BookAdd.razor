@@ -151,7 +151,7 @@ else
                 bookNew.Genres.Add(genres.First(x => x.Id == id));
             }
 
-            bookNew.LastRedactor = authService.CurrentUser!;
+            bookNew.LastRedactorId = authService.CurrentUser!.Id;
 
             bookNew.AuthorId ??= authors.First().Id;
 

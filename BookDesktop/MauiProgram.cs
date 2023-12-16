@@ -11,7 +11,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        if (Environment.CurrentDirectory.Contains(@"\bin\"))
+        if (AppDomain.CurrentDomain.BaseDirectory.Contains(@"\bin\"))
         {
             Environment.CurrentDirectory =
                 AppDomain.CurrentDomain.BaseDirectory.Substring(0,

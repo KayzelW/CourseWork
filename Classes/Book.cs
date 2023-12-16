@@ -17,7 +17,7 @@ public class Book : INotifyPropertyChanged
     public int Amount { get; set; } = 0;
     public virtual List<Genre> Genres { get; set; } = new();
     public virtual List<Order> Orders { get; set; } = new();
-    public User? LastRedactor { get; set; } = null;
+    public int LastRedactorId { get; set; }
 
     public Book(int id, string name, Author author, double price, int amount) : this() =>
         (this.Id, this.Name, this.Author, this.Price, this.Amount) = (id, name, author, price, amount);
@@ -31,7 +31,7 @@ public class Book : INotifyPropertyChanged
     {
         Name = book.Name;
         AuthorId = book.AuthorId;
-        LastRedactor = book.LastRedactor;
+        LastRedactorId = book.LastRedactorId;
         Genres.AddRange(book.Genres);
         Price = book.Price;
         Amount = book.Amount;
