@@ -51,38 +51,42 @@ else
                                 </tr>
                             }
                         </table>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-list-check" title="Изменить статус"></i>
-                                Изменить статус
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Approved))">
-                                        <i class="bi bi-check-circle-fill" title="Подтвердить"></i>
-                                        Подтвердить
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Completed))">
-                                        <i class="bi bi-check2-all" title="Выполнен"></i>
-                                        Выполнен
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Cancelled))">
-                                        <i class="bi bi-x-lg" title="Отменить"></i>
-                                        Отменить
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.InDeliver))">
-                                        <i class="bi bi-truck" title="В пути"></i>
-                                        В пути
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
+
+                        @if (authService.CurrentUser!.PermissionLvl != 1)
+                        {
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-list-check" title="Изменить статус"></i>
+                                    Изменить статус
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Approved))">
+                                            <i class="bi bi-check-circle-fill" title="Подтвердить"></i>
+                                            Подтвердить
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Completed))">
+                                            <i class="bi bi-check2-all" title="Выполнен"></i>
+                                            Выполнен
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.Cancelled))">
+                                            <i class="bi bi-x-lg" title="Отменить"></i>
+                                            Отменить
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" onclick="@(() => ChangeOrderStatus(order, OrderStatus.InDeliver))">
+                                            <i class="bi bi-truck" title="В пути"></i>
+                                            В пути
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
